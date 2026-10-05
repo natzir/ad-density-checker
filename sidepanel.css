@@ -120,7 +120,16 @@ tbody th { text-align: left; color: var(--muted); }
 /* Two buttons per row on fixed shares, labels on one line: the "Preparing…" swap changes no box. */
 .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
 .actions .ghost { flex: 1 1 calc(50% - 4px); white-space: nowrap; }
-.actions .ghost:nth-child(3) { flex-basis: 100%; }
+/* The downloads: two links under the buttons, each centred in its half. */
+.downloads { display: flex; gap: 8px; margin: 8px 0 0; }
+.downloads .download { flex: 1 1 calc(50% - 4px); display: inline-flex; align-items: center; justify-content: center; gap: 5px; text-underline-offset: 2px; white-space: nowrap; }
+.downloads .download[aria-disabled="true"] { opacity: 0.6; cursor: progress; }
+.icon { width: 14px; height: 14px; flex: none; }
+/* A label and its "Preparing…" share one cell: the wider sets the width, so a click moves nothing. */
+.swap { display: inline-grid; }
+.swap > span { grid-area: 1 / 1; text-align: center; }
+.swap .busy, [aria-busy="true"] .swap .idle { visibility: hidden; }
+[aria-busy="true"] .swap .busy { visibility: visible; }
 /* What each export gives, folded like the "Why?" notes: closed it is one line, so nothing moves. */
 .snapshot-help { margin-top: 10px; }
 .snapshot-help summary { cursor: pointer; color: var(--text); }

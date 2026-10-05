@@ -65,7 +65,7 @@ One test, two views of its result, switched with **Real · Chrome** above the ve
 
 Chrome's own figures (its tags, its average share of the screen) are the same in both views.
 
-Both views come from the same page load, so they compare the same ads. **Open full size** shows the view on screen in a new tab and **Download** saves it (its header says which); **Download Chrome vs Real** saves both side by side under the page's whole URL. A "What do these give you?" note under the buttons says the same.
+Both views come from the same page load, so they compare the same ads. **Open full size** shows the view on screen in a new tab (its header says which) and **Open comparison** both side by side under the page's whole URL; the **Download** and **Download comparison** links under them save the same images. A "What do these give you?" note under them says the same.
 
 ### Snapshot
 

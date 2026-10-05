@@ -26,7 +26,7 @@ Open the side panel, pick Mobile or Desktop and run the test. The extension relo
 • Better Ads verdict: ad density against the Coalition for Better Ads limits (30 % on mobile, 50 % on desktop), the large sticky ad check (30 % of the screen) and pop-ups, ad gates included (a layer that blurs the article until the reader goes through an ad).
 • Two views of the same test. Real counts every ad a reviewer would; Chrome keeps only the ads Chrome tags, the ones behind its CrUX ad metrics. Switch between them to see which ads Chrome misses, and what it tags that isn't an ad, such as the site's own video player.
 • Viewport figures by Chrome's rules: average and peak share of the screen covered by ads, and the ad count, next to real-user data from the Chrome UX Report (CrUX) once you add a free API key.
-• A snapshot of the tested page, stitched from the screens of the test, with every ad marked as counted, sticky or not counted (and why), the ads Chrome misses in their own colour, and the main content limits. Download either view as a JPEG, or both side by side as a Chrome vs Real image.
+• A snapshot of the tested page, stitched from the screens of the test, with every ad marked as counted, sticky or not counted (and why), the ads Chrome misses in their own colour, and the main content limits. Open or download either view as a JPEG, or both side by side as a Chrome vs Real image.
 • What a reviewer would flag besides: if the page sends the reader to another site on its own (an automatic redirect, often to a scam), the test stops there, says where it went and brings the tab back.
 
 For SEO, publishers and ad-ops teams who want to check pages before Google's ad experience review or Chrome's ad filtering does.

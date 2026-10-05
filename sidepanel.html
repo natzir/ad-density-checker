@@ -130,16 +130,20 @@
       <div id="strip-box" class="strip" role="region" aria-label="Snapshot strip" tabindex="0"><canvas id="strip" role="img"></canvas></div>
       <p id="snapshot-missing" class="muted small" hidden></p>
       <div id="snapshot-actions" class="actions">
-        <button id="open-snapshot" class="ghost" type="button">Open full size</button>
-        <button id="download-snapshot" class="ghost" type="button">Download</button>
-        <button id="compare-snapshot" class="ghost" type="button">Download Chrome vs Real</button>
+        <button id="open-snapshot" class="ghost" type="button"><span class="swap"><span class="idle">Open full size</span><span class="busy">Preparing…</span></span></button>
+        <button id="open-compare" class="ghost" type="button"><span class="swap"><span class="idle">Open comparison</span><span class="busy">Preparing…</span></span></button>
+      </div>
+      <div id="snapshot-downloads" class="downloads small">
+        <button id="download-snapshot" class="link download" type="button"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v7.5M4.75 6.75 8 10l3.25-3.25M3 13h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="swap"><span class="idle">Download</span><span class="busy">Preparing…</span></span></button>
+        <button id="compare-snapshot" class="link download" type="button"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v7.5M4.75 6.75 8 10l3.25-3.25M3 13h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="swap"><span class="idle">Download comparison</span><span class="busy">Preparing…</span></span></button>
       </div>
       <details id="snapshot-help" class="snapshot-help small">
         <summary>What do these give you?</summary>
         <ul class="muted">
           <li><b>Open full size</b>: the whole page in the view on screen (Real or Chrome), in a new tab.</li>
-          <li><b>Download</b>: that same image as a JPG.</li>
-          <li id="compare-help"><b>Download Chrome vs Real</b>: one image with both views of this test side by side, under the page's full URL: on the left what Chrome tags, on the right what a reviewer would count.</li>
+          <li id="compare-help"><b>Open comparison</b>: one image with both views of this test side by side, under the page's full URL: on the left what Chrome tags, on the right what a reviewer would count.</li>
+          <li><b>Download</b>: the view on screen as a JPG.</li>
+          <li id="compare-download-help"><b>Download comparison</b>: the comparison as a JPG.</li>
         </ul>
       </details>
     </section>

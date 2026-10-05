@@ -28,7 +28,7 @@ const outcomeKey = (tabId, device) => `${tabId}|${device}`;
 const KEEP_SNAPSHOTS = 5;
 let stripFor = null; // the test result the strip shows or is being drawn for
 let stripView = 'real'; // and the view it shows
-let openedUrl = null;
+const opened = { view: null, compare: null }; // the images opened in a tab, by kind
 let logo = null;
 const formFactor = () => (state.device === 'desktop' ? 'DESKTOP' : 'PHONE');
 let cruxRequest = 0;
@@ -70,10 +70,10 @@ async function currentTab() {
   return tab ?? null;
 }
 
-// While a test runs, the panel stays on the tested tab; while its snapshot is open full size, on
-// that result, so Download still works.
+// While a test runs, the panel stays on the tested tab; while its snapshot or comparison is open in a
+// tab, on that result, so Download still works.
 async function showTab(tab) {
-  if (state.running || (openedUrl && [tab?.url, tab?.pendingUrl].includes(openedUrl))) return;
+  if (state.running || Object.values(opened).some((url) => url && [tab?.url, tab?.pendingUrl].includes(url))) return;
   state.tab = tab;
   const saved = tab ? outcomes.get(outcomeKey(tab.id, state.device)) : null;
   const current = saved && samePage(saved.url, tab.url) ? saved : null;
@@ -387,8 +387,8 @@ function render() {
   $('snapshot-missing').hidden = Boolean(snapshot);
   setText($('snapshot-missing'), snapshotMissingNote(state.test, KEEP_SNAPSHOTS));
   $('strip').setAttribute('aria-label', snapshot ? snapshotLabel({ betterAds: viewBetterAds(state.test, currentView()) }, currentView()) : '');
-  $('compare-snapshot').hidden = !state.test?.chromeView;
-  $('compare-help').hidden = !state.test?.chromeView;
+  $('snapshot-downloads').hidden = !snapshot;
+  for (const id of ['open-compare', 'compare-snapshot', 'compare-help', 'compare-download-help']) $(id).hidden = !state.test?.chromeView;
   if (snapshot && (stripFor !== state.test || stripView !== currentView())) drawStrip(state.test, currentView());
   if (!snapshot) stripFor = null;
 }
@@ -440,63 +440,62 @@ function snapshotBlob(test, view) {
   return exported.blob;
 }
 
-// While the image is made the pressed button says so at once and neither button takes another
-// click (a second click looked needed when nothing changed). aria-disabled, not disabled: the
-// button keeps the keyboard focus.
+// While the image is made the pressed control says so at once ("Preparing…", in the same cell as its label,
+// so nothing moves) and none of them takes another click (a second click looked needed when nothing
+// changed). aria-disabled, not disabled: the control keeps the keyboard focus.
 let exporting = false;
-async function whileExporting(button, work) {
+const exportControls = () => ['open-snapshot', 'open-compare', 'download-snapshot', 'compare-snapshot'].map((id) => $(id));
+async function whileExporting(control, work) {
   if (exporting) return;
   exporting = true;
-  const buttons = [$('open-snapshot'), $('download-snapshot'), $('compare-snapshot')];
-  const label = button.textContent;
-  for (const b of buttons) b.setAttribute('aria-disabled', 'true');
-  button.setAttribute('aria-busy', 'true');
-  setText(button, 'Preparing…');
+  for (const c of exportControls()) c.setAttribute('aria-disabled', 'true');
+  control.setAttribute('aria-busy', 'true');
   try {
     // Paint the label first.
     await afterPaint();
     await work();
   } finally {
-    setText(button, label);
-    button.removeAttribute('aria-busy');
-    for (const b of buttons) b.removeAttribute('aria-disabled');
+    control.removeAttribute('aria-busy');
+    for (const c of exportControls()) c.removeAttribute('aria-disabled');
     exporting = false;
   }
+}
+
+// Opens an image in a new tab; the one opened before of the same kind (view or comparison) is let go.
+async function openImage(kind, blob) {
+  if (opened[kind]) URL.revokeObjectURL(opened[kind]);
+  opened[kind] = URL.createObjectURL(blob);
+  await chrome.tabs.create({ url: opened[kind] });
+}
+function saveImage(blob, filename) {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 60000);
 }
 
 $('open-snapshot').addEventListener('click', (event) => {
   const test = state.test;
   if (!test?.snapshot) return;
   const view = currentView();
-  whileExporting(event.currentTarget, async () => {
-    const blob = await snapshotBlob(test, view);
-    if (openedUrl) URL.revokeObjectURL(openedUrl);
-    openedUrl = URL.createObjectURL(blob);
-    await chrome.tabs.create({ url: openedUrl });
-  });
+  whileExporting(event.currentTarget, async () => openImage('view', await snapshotBlob(test, view)));
+});
+$('open-compare').addEventListener('click', (event) => {
+  const test = state.test;
+  if (!test?.snapshot || !test.chromeView) return;
+  whileExporting(event.currentTarget, async () => openImage('compare', await compareBlob(test)));
 });
 $('download-snapshot').addEventListener('click', (event) => {
   const test = state.test;
   if (!test?.snapshot) return;
   const view = currentView();
-  whileExporting(event.currentTarget, async () => {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(await snapshotBlob(test, view));
-    link.download = snapshotFilename(test, view === 'chrome' ? '-chrome' : '');
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(link.href), 60000);
-  });
+  whileExporting(event.currentTarget, async () => saveImage(await snapshotBlob(test, view), snapshotFilename(test, view === 'chrome' ? '-chrome' : '')));
 });
 $('compare-snapshot').addEventListener('click', (event) => {
   const test = state.test;
   if (!test?.snapshot || !test.chromeView) return;
-  whileExporting(event.currentTarget, async () => {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(await compareBlob(test));
-    link.download = snapshotFilename(test, '-chrome-vs-real');
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(link.href), 60000);
-  });
+  whileExporting(event.currentTarget, async () => saveImage(await compareBlob(test), snapshotFilename(test, '-chrome-vs-real')));
 });
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && state.running) {
