@@ -1,0 +1,13 @@
+{
+  "name": "ad-density-checker",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "adlists": "node scripts/build-adlists.mjs",
+    "icons": "node scripts/make-icons.mjs",
+    "pack": "node scripts/pack.mjs"
+  }
+}

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ad Density Checker</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <header class="brand">
+    <span class="logo" aria-hidden="true"></span>
+    <div>
+      <h1>Ad Density Checker</h1>
+      <p class="tagline">ads vs. content · <a href="https://natzir.com" target="_blank" rel="noopener">natzir.com</a></p>
+    </div>
+  </header>
+
+  <main>
+    <p id="page" class="page"><span id="page-host"></span><span id="page-path" class="muted"></span></p>
+    <div class="controls">
+      <div id="devices" class="devices" role="radiogroup" aria-label="Device">
+        <button id="device-mobile" type="button" role="radio" data-device="mobile">Mobile</button>
+        <button id="device-desktop" type="button" role="radio" data-device="desktop">Desktop</button>
+      </div>
+      <button id="run" class="primary" type="button">Run mobile test</button>
+    </div>
+    <p id="notice" class="notice" hidden></p>
+    <p id="stop-note" class="notice info" hidden></p>
+
+    <section id="intro" aria-labelledby="intro-title" hidden>
+      <h2 id="intro-title" class="label">What the test does</h2>
+      <ul class="card bullets">
+        <li>Reloads the page as a phone or a desktop and scrolls down it (up to 60 s); on an article it stops at the article's end.</li>
+        <li>Measures the ads the way Chrome does and checks the Better Ads limits.</li>
+        <li>Stay on this tab while it runs: in another tab or window the test pauses.</li>
+      </ul>
+    </section>
+
+    <section id="progress" aria-labelledby="progress-title" hidden>
+      <h2 id="progress-title" class="label">Measuring</h2>
+      <p class="notice info stay"><strong>Stay on this tab until the test ends:</strong> in another tab or window it pauses. Until then, the page ignores your scrolling, clicks and typing. Chrome shows a “started debugging this browser” bar; Cancel there also stops the test.</p>
+      <div class="card">
+        <div class="row between"><span id="elapsed" class="muted"></span><button id="cancel" class="ghost small" type="button">Cancel</button></div>
+        <div id="bar" class="bar" role="progressbar" aria-label="Test progress" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0"><span id="bar-fill"></span></div>
+        <p class="live"><strong id="now" class="big">—</strong><span class="muted">ads on screen now</span></p>
+        <p id="spark" class="spark" aria-hidden="true"></p>
+      </div>
+    </section>
+
+    <section id="better-ads" aria-labelledby="better-title" hidden>
+      <div id="views" class="devices views" role="radiogroup" aria-label="View">
+        <button id="view-real" type="button" role="radio" data-view="real">Real</button>
+        <button id="view-chrome" type="button" role="radio" data-view="chrome">Chrome</button>
+      </div>
+      <h2 id="better-title" class="label view-notes"><span id="better-title-real" class="view-layer" data-view="real">Better Ads</span><span id="better-title-chrome" class="view-layer" data-view="chrome">Better Ads</span></h2>
+      <p id="better-help" class="help muted small">Share of the main content's height that has ads (ads side by side count once).</p>
+      <div class="card">
+        <p id="chrome-line" class="muted small chrome-line"></p>
+        <div class="check">
+          <div class="check-head"><h3 class="check-name">Ad density</h3><span id="density-pill" class="pill"></span></div>
+          <p class="check-value"><span id="density-value" class="big"></span><span class="muted small"><span id="density-of">of the main content</span><span id="density-limit-sr" class="visually-hidden"></span></span></p>
+          <div class="gauge" aria-hidden="true"><span id="density-fill" class="gauge-fill"></span><span id="density-limit" class="gauge-limit"></span><span id="density-limit-label" class="gauge-label"></span></div>
+          <div class="gauge-scale muted small" aria-hidden="true"><span>0%</span><span>100%+</span></div>
+          <div class="view-notes">
+            <div class="view-layer" data-view="real">
+              <p id="density-note" class="density-note muted small" hidden></p>
+              <div id="unseen" class="unseen small" hidden>
+                <p id="unseen-text" class="muted"></p>
+                <details>
+                  <summary>Why?</summary>
+                  <p class="muted">Chrome recognises ads with a cut-down filter list. These come from ad tech it doesn't list, or are the site's own ads labelled as advertising. A reviewer counts them too.</p>
+                </details>
+              </div>
+            </div>
+            <div class="view-layer" data-view="chrome">
+              <p id="chrome-density-note" class="density-note muted small" hidden></p>
+              <div id="chrome-unseen" class="unseen small" hidden>
+                <p id="chrome-unseen-text" class="muted"></p>
+                <details>
+                  <summary>Why?</summary>
+                  <p class="muted">Chrome tags every element an ad script makes, whatever it shows. These aren't counted because a reader doesn't see them as ads there.</p>
+                </details>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="check sticky-check">
+          <div class="check-head"><h3 class="check-name">Large sticky ad</h3><span id="sticky-pill" class="pill"></span></div>
+          <p class="check-value"><span id="sticky-value" class="mid"></span><span id="sticky-detail" class="muted small"></span></p>
+        </div>
+        <div class="check sticky-check">
+          <div class="check-head"><h3 class="check-name">Pop-up / interstitial</h3><span id="interstitial-pill" class="pill"></span></div>
+          <p class="check-value"><span id="interstitial-value" class="mid"></span><span id="interstitial-detail" class="muted small"></span></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="viewport" aria-labelledby="viewport-title">
+      <h2 id="viewport-title" class="label">Viewport · Chrome rules</h2>
+      <p id="viewport-help" class="help muted small">Share of the screen covered by ads, over time.</p>
+      <div class="card">
+        <p id="test-line" class="test-line" hidden>
+          <span class="muted small">Ads on screen during the test</span>
+          <span id="test-spark" class="spark" aria-hidden="true"></span>
+          <span id="test-peak" class="test-peak small" aria-hidden="true"></span>
+          <span id="test-line-sr" class="visually-hidden"></span>
+        </p>
+        <table id="metrics">
+          <thead><tr><td></td><th scope="col">Test</th><th id="crux-head" scope="col">CrUX p75</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div id="crux" class="crux">
+          <p id="crux-status" class="muted small"></p>
+          <p class="links small"><a id="crux-vis" target="_blank" rel="noopener">Open in CrUX Vis ↗</a><button id="change-key" class="link" type="button" hidden>Change key</button></p>
+          <form id="key-form" class="key-form" hidden>
+            <p id="key-intro" class="small muted">Add a free CrUX API key to see real-user ad metrics here.</p>
+            <label for="key-input" class="small">CrUX API key</label>
+            <div class="key-row"><input id="key-input" type="password" autocomplete="off" spellcheck="false" aria-describedby="key-message"><button id="key-save" class="ghost" type="submit">Save</button></div>
+            <p class="small muted"><a href="https://developer.chrome.com/docs/crux/api#APIKey" target="_blank" rel="noopener">How to get a key ↗</a> · stays in this browser</p>
+            <p id="key-edit-actions" class="links small" hidden><button id="key-cancel" class="link" type="button">Cancel</button><button id="key-remove" class="link" type="button">Remove key</button></p>
+          </form>
+          <p id="key-message" class="small" role="status"></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="snapshot" aria-labelledby="snapshot-title" hidden>
+      <h2 id="snapshot-title" class="label">Snapshot</h2>
+      <div id="strip-box" class="strip" role="region" aria-label="Snapshot strip" tabindex="0"><canvas id="strip" role="img"></canvas></div>
+      <p id="snapshot-missing" class="muted small" hidden></p>
+      <div id="snapshot-actions" class="actions">
+        <button id="open-snapshot" class="ghost" type="button">Open full size</button>
+        <button id="download-snapshot" class="ghost" type="button">Download</button>
+        <button id="compare-snapshot" class="ghost" type="button">Download Chrome vs Real</button>
+      </div>
+      <details id="snapshot-help" class="snapshot-help small">
+        <summary>What do these give you?</summary>
+        <ul class="muted">
+          <li><b>Open full size</b>: the whole page in the view on screen (Real or Chrome), in a new tab.</li>
+          <li><b>Download</b>: that same image as a JPG.</li>
+          <li id="compare-help"><b>Download Chrome vs Real</b>: one image with both views of this test side by side, under the page's full URL: on the left what Chrome tags, on the right what a reviewer would count.</li>
+        </ul>
+      </details>
+    </section>
+
+    <div id="announcer" class="visually-hidden" aria-live="polite"></div>
+  </main>
+
+  <footer class="muted small">
+    <p>Test values use Chrome's ad detection and density rules; they can differ from DevTools by about 2 points. Ad CPU and network: CrUX only.</p>
+    <p>Chrome sets no thresholds for its ad metrics; the Better Ads limits are the only documented ones.</p>
+  </footer>
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

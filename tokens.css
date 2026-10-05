@@ -1,0 +1,43 @@
+/* Colour tokens: the natzir.com tools family (Passage Lens), dark by default, light when the
+   system asks for it. test/contrast.test.js checks every text pair against WCAG AA. */
+:root {
+  color-scheme: dark;
+  --bg: #172224;
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-2: rgba(255, 255, 255, 0.11);
+  --line: rgba(255, 255, 255, 0.08);
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.66);
+  --pass: #2ecc71;
+  --pass-bg: rgba(46, 204, 113, 0.16);
+  --fail: #ff8370;
+  --fail-bg: rgba(255, 107, 84, 0.12);
+  --warn: #f1c40f;
+  --warn-bg: rgba(241, 196, 15, 0.12);
+  --focus: #7dd3fc;
+  --primary-bg: #ffffff;
+  --primary-fg: #172224;
+  --input-bg: rgba(0, 0, 0, 0.25);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --bg: #f6f8f8;
+    --surface: #ffffff;
+    --surface-2: #e7eeee;
+    --line: #d5dfe0;
+    --text: #172224;
+    --muted: #4d5c5e;
+    --pass: #137a3f;
+    --pass-bg: #e3f4ea;
+    --fail: #c0392b;
+    --fail-bg: #fbe9e7;
+    --warn: #7a6000;
+    --warn-bg: #fbf3d0;
+    --focus: #0b6bcb;
+    --primary-bg: #172224;
+    --primary-fg: #ffffff;
+    --input-bg: #ffffff;
+  }
+}

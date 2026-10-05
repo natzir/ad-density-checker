@@ -1,0 +1,193 @@
+The network rules in lib/adlists.js come from the lists below: EasyList, and the regional lists, each used on pages in its languages. Only their network rules that name a host, and their exception rules (those whose options the extension reads), are used, unmodified.
+
+Each list is the work of its own authors and is used under its own licence. EasyList is © The EasyList authors (https://easylist.to/); the regional lists are by their maintainers. For each list, its version and the lines of its header that say what it is, who makes it and under what terms, copied verbatim (without the update bookkeeping).
+
+EasyList (version 202610031209)
+! Title: EasyList
+! Please report any unblocked adverts or problems
+! in the forums (https://forums.lanik.us/)
+! or via e-mail (easylist@protonmail.com).
+! Homepage: https://easylist.to/
+! Licence: https://easylist.to/pages/licence.html
+! GitHub issues: https://github.com/easylist/easylist/issues
+! GitHub pull requests: https://github.com/easylist/easylist/pulls
+
+EasyList Spanish (version 202610031202)
+! Title: EasyList Spanish
+! Homepage: https://easylist.to/
+! Licence: https://easylist.to/pages/licence.html
+! Please report any unblocked adverts or problems
+! in the forums (https://forums.lanik.us/viewforum.php?f=103)
+! or via e-mail (easylistspanish@protonmail.com).
+
+Liste FR (version 202610031202)
+! Title: Liste FR
+! Homepage: https://forums.lanik.us/viewforum.php?f=91
+! Description: Filtres publicitaires francophones complémentaires à EasyList
+! Repo Git: https://github.com/easylist/listefr
+! Licence : https://creativecommons.org/licenses/by-sa/3.0/
+! Merci de signaler toute publicité non filtrée ou tout problème
+! dans le forum : https://forums.lanik.us/viewforum.php?f=91
+! ou via e-mail : liste.fr.easylist $ gmail.com
+
+EasyList Germany (version 202609291601)
+! Title: EasyList Germany
+! Homepage: https://easylist.to/
+! Licence: https://easylist.to/pages/licence.html
+! Bitte melde ungeblockte Werbung und fälschlicherweise geblockte Dinge:
+! Forum: https://forums.lanik.us/viewforum.php?f=90
+! E-Mail: easylist.germany@gmail.com
+! GitHub issues: https://github.com/easylist/easylistgermany/issues
+! GitHub pull requests: https://github.com/easylist/easylistgermany/pulls
+
+EasyList Italy (version 202610031202)
+! Title: EasyList Italy
+! Homepage: https://easylist.to/
+! Licenza: https://easylist.to/pages/licence.html
+! EasyList Italy - Complemento italiano per EasyList
+! Per favore segnala problemi o pubblicità non bloccate
+! nel forum: (https://forums.lanik.us/)
+! o via e-mail: (easylistitaly@protonmail.com).
+
+EasyList Portuguese (version 202610031202)
+! Title: EasyList Portuguese
+! Homepage: https://easylist.to/
+! Licence: https://easylist.to/pages/licence.html
+! Please report any unblocked adverts or problems
+! in the forums (https://forums.lanik.us/viewforum.php?f=109)
+! or via e-mail (easylistportuguese@protonmail.com)
+
+EasyList Dutch (version 202610031202)
+! Title: EasyList Dutch
+! Homepage: https://easylist.to/
+! EasyList Dutch subscription
+! Description: Dutch supplement for the Easylist filters
+! Licence: https://easylist.to/pages/licence.html
+! Alleen voor advertenties op Nederlandstalige sites!
+! Rapporteer gevonden advertenties of fouten hier:
+! https://forums.lanik.us/viewforum.php?f=100
+! of stuur een email naar easylistdutch@protonmail.com
+
+EasyList Polish (version 202610031202)
+! Title: EasyList Polish
+! Homepage: https://easylist.to/
+! Licence: https://easylist.to/pages/licence.html
+! Please report any unblocked adverts or problems
+! in the via e-mail (easylist.polish@gmail.com).
+
+EasyList Lithuania (version 202610031202)
+! Title: EasyList Lithuania
+! Homepage: https://github.com/EasyList-Lithuania/easylist_lithuania
+! EasyList Lithuania subscription
+! Prisidėjo: Imre Eilertsen (Dandelion Sprout), iibett. (Anksčiau: Algimantas Margevičius, Mantas Malcius)
+! Apie neužblokuotas reklamas ar kitas bėdas praneškite https://github.com/EasyList-Lithuania/easylist_lithuania/issues arba forume https://forums.lanik.us/viewforum.php?f=101
+! Licencija: Šis turinys yra pateikiamas pagal GNU GPL3 licenciją - https://www.gnu.org/licenses/gpl-3.0.txt
+! Description: Removes ads on Lithuanian-language websites.
+
+EasyList Czech and Slovak (version 202610031202)
+! Title: EasyList Czech and Slovak
+! Homepage: https://adblock.sk/
+! EasyList Czech and Slovak subscription
+! List maintainers: tomasko126, Aslanex, vobruba-martin, Moskoe, Fanboy
+! GitHub repository: https://github.com/tomasko126/easylistczechandslovak
+! GitHub contributors: https://github.com/tomasko126/easylistczechandslovak/graphs/contributors
+! License: CC-BY-SA v4.0
+! Email: tomastaro@adblock.sk
+! Supported filters: https://adblockplus.org/en/filters
+
+ROList (version 202610031202)
+! Title: ROList
+! Homepage: https://www.zoso.ro/rolist/
+! ROList subscription
+! Original list, by Menetz, was handed over to Zoso to host and maintain.
+! A complementary list, with more strict items, is here https://zoso.ro/pages/rolist2.txt
+! License: http://creativecommons.org/licenses/by/3.0/
+! Email: mail@zoso.ro
+
+Bulgarian list (version 202610031202)
+! Title: Bulgarian list
+! Homepage: https://stanev.org/abp/
+! Bulgarian list subscription
+! This list is supplemental subscription to EasyList (https://easylist.to)
+! Contact me at alex at stanev dot org
+(Its header states no licence.)
+
+RU AdList (version 202610031202)
+! Title: RU, UA, UZ, KZ
+! Homepage: https://forums.lanik.us/viewforum.php?f=102
+! Дополнительный региональный фильтр RU AdList к фильтру EasyList
+! Лицензия CC-BY: http://creativecommons.org/licenses/by/3.0/
+! Проект создал Akuma (DemonSat) на основе списка фильтров denis-ovs.narod.ru.
+! Список содержит фрагменты списков MORPEH'а и Fanboy'я, результаты изучения
+! содержимого подписки UA-IX Banlist и некоторые правила из
+! Reek's Anti-Adblock Killer (https://github.com/reek/anti-adblock-killer)
+! В разное время над списком фильтров работали: denis-ovs, Akuma, Radik245.
+! На данный момент над списком работают Lain_13 и dimisa.
+! Если на вашем любимом сайте осталась реклама или фильтр создаёт проблемы
+! в его работе, то свяжитесь с нами:
+! https://forums.lanik.us/viewforum.php?f=102
+
+EasyList China (version 202610031202)
+! Title: EasyList China
+! Homepage: https://github.com/easylist/easylistchina/
+! EasyList China subscription
+! Chinese supplement for the EasyList filters
+! License: https://easylist.to/pages/licence.html
+! Please report any unblocked adverts or problems
+! on GitHub (https://github.com/easylist/easylistchina/issues)
+! or via e-mail (easylist.china@gmail.com).
+
+KoreanList (version 202610031202)
+! Title: KoreanList
+! Homepage: https://forums.lanik.us/viewforum.php?f=111
+! Licence: https://easylist.to/pages/licence.html
+! Please report any unblocked adverts or problems
+! in the forums (https://forums.lanik.us/viewforum.php?f=111)
+! on GitHub (https://github.com/easylist/KoreanList)
+! or via e-mail (koreanfilterlist@gmail.com).
+
+IndianList (version 202610031202)
+! Title: IndianList
+! Homepage: https://easylist.to/
+! Licence: https://easylist.to/pages/licence.html
+! Please report any unblocked adverts or problems
+! in the forums (https://forums.lanik.us/viewforum.php?f=110)
+! or via e-mail (indianfilterlist@gmail.com).
+
+ABPVN List (version 202610031202)
+! Title: ABPVN List
+! Homepage: https://abpvn.com/
+! ABPVN List subscription
+! ABPVN List filter
+! Copyright: ABPVN
+! License: GPLv3 (https://github.com/abpvn/abpvn/blob/master/LICENSE)
+! Please report any unblocked ads or problems by email or in our fanpage
+! Mọi thắc mắc xin gửi về email hoặc fanpage
+! Email: support@abpvn.com
+! Facebook Fanpage: https://www.facebook.com/abpvn.org
+! Forum: https://voz.vn/t/official-abpvn-bo-loc-quang-cao-cho-nguoi-viet-bao-cao-quang-cao-giai-dap-thac-mac.867616/
+! Report new issue on github: https://github.com/abpvn/abpvn/issues/new
+
+ABPindo (version 202610031202)
+! Title: ABPindo
+! Homepage: https://github.com/ABPindo/indonesianadblockrules/
+! ABPindo subscription
+! Description: Filter tambahan untuk EasyList memblokir iklan berbahasa Indonesia dan Malaysia.
+! License: https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/LICENSE
+! Please report any unblocked adverts or problems:
+! GitHub issues: https://github.com/ABPindo/indonesianadblockrules/issues
+! GitHub pull requests: https://github.com/ABPindo/indonesianadblockrules/pulls
+
+Liste AR (version 202610031202)
+! Title: Liste AR
+! Homepage: https://code.google.com/p/liste-ar-adblock/
+! Abonnements à la Liste AR
+! Description: القائمة العربية لمانع الشرائط الإعلانية آدبلوك بلس، مكمِّلة للقائمة الفرنسية و الإنجليزية
+! Repo Git: https://github.com/easylist/listear
+! Licence : https://creativecommons.org/licenses/by-sa/3.0/
+! شكرا للإبلاغ عن أي إعلان أو لافتة إشهارية غير محجوبة
+! Merci de signaler toute publicité non bloquée ou tout blocage inadéquat.
+! dans le forum : https://forums.lanik.us/viewforum.php?f=98
+! e-mail : liste.ar.easylist $ gmail.com
+! To be efficient, Liste AR should be used in addition to EasyList + Liste FR
+! https://easylist-downloads.adblockplus.org/liste_fr+easylist.txt
