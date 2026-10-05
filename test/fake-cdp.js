@@ -49,6 +49,7 @@ export function fakeCdp({
   growOnScroll = 0,
   failAttach = null,
   loadFires = true,
+  loadAtTick = null, // the load event fires once the page state has been read this many times (ads loading on)
   vanishingAds = [],
   hiddenTicks = [],
   content = null,
@@ -110,6 +111,7 @@ export function fakeCdp({
         return new Promise((resolve) => { cdp.commit = () => resolve(true); });
       }
       if (method === 'Page.frameNavigated') predicate?.({ frame: commitFrame });
+      if (method === 'Page.loadEventFired' && loadAtTick != null) return new Promise((resolve) => { cdp.fireLoad = () => resolve(true); });
       return Promise.resolve(loadFires);
     },
     async detach() {
@@ -151,6 +153,7 @@ export function fakeCdp({
           if (params.expression === PAGE_INFO_EXPR) return { result: { value: { href: commitFrame.url, lang } } };
           if (params.expression === ZOOM_EXPR) return { result: { value: dpr } };
           if (params.expression === PAGE_STATE_EXPR) {
+            if (loadAtTick != null && stateCalls >= loadAtTick) cdp.fireLoad?.();
             if (failEveryState) throw new Error('Execution context was destroyed.');
             for (const event of events.filter((e) => e.atTick === stateCalls)) {
               for (const listener of [...listeners]) listener(event.method, event.params);

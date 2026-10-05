@@ -637,6 +637,16 @@ test('a fixed anchor ad is never closed', async () => {
   assert.equal(result.betterAds.interstitial.found, false);
 });
 
+test('starts a few seconds after the document is ready, without waiting for a load event that comes late', async () => {
+  // Newsweek: DOMContentLoaded at 0.9 s, the load event at 35 s, with ads still loading: the test sat still for 30 s
+  // and ran out of its minute before the end of the article.
+  const { cdp, run } = setup({ pageHeight: 6000, loadAtTick: 40 });
+  await run();
+  const first = cdp.sent.findIndex((c) => c.method === 'Runtime.evaluate' && c.params.expression === SCROLL_EXPR);
+  const samplesBefore = cdp.sent.slice(0, first).filter((c) => c.params?.expression === PAGE_STATE_EXPR).length;
+  assert.ok(first > 0 && samplesBefore <= 12, `${samplesBefore} samples before the first scroll`);
+});
+
 test('flags a page whose load event never fires and still measures it', async () => {
   const { run } = setup({ loadFires: false });
   const result = await run();
