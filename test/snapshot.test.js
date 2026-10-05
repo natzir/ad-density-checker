@@ -270,6 +270,45 @@ test('a long label wraps inside its box and never runs past the image\'s edge, e
   for (const [, text, x] of narrow) assert.ok(x >= 0 && x + text.length * 6 <= 412, `${text} stays in the image`);
 });
 
+// The label boxes drawn: white boxes, as tag() fills them.
+const labelBoxes = (ctx) => {
+  const boxes = [];
+  let white = false;
+  for (const c of ctx.calls) {
+    if (c[0] === 'set' && c[1] === 'fillStyle') white = c[2] === 'rgba(255, 255, 255, 0.92)';
+    else if (c[0] === 'fillRect' && white) boxes.push(c.slice(1));
+  }
+  return boxes;
+};
+
+test('labels of marks that meet are stacked, so none covers another', () => {
+  // CBS desktop: Infolinks' sticky band and the creative Chrome tags in it, both labelled at the same corner.
+  const plan = snapshotLayout({
+    snapshot: { viewport: { width: 412, height: 800 }, pageHeight: 800, tiles: [tile(0)] },
+    betterAds: { content: { begin: 0, end: 800 }, contentDetected: true, ads: [
+      ad('band', 300, 56, { x: 20, width: 380, source: 'easylist', why: 'EasyList ||infolinks.com^$third-party' }),
+      ad('creative', 296, 50, { x: 24, width: 370 }),
+    ] },
+  });
+  const ctx = recorder();
+  drawSnapshot(ctx, plan, ['a']);
+  const boxes = labelBoxes(ctx);
+  assert.equal(boxes.length, 2);
+  const [[x1, y1, w1, h1], [x2, y2, w2, h2]] = boxes;
+  assert.ok(x1 + w1 <= x2 || x2 + w2 <= x1 || y1 + h1 <= y2 || y2 + h2 <= y1, `labels overlap: ${JSON.stringify(boxes)}`);
+});
+
+test('labels are drawn over every mark, so a later mark doesn\'t tint an earlier label', () => {
+  const plan = snapshotLayout({
+    snapshot: { viewport: { width: 412, height: 800 }, pageHeight: 800, tiles: [tile(0)] },
+    betterAds: { content: { begin: 0, end: 800 }, contentDetected: true, ads: [ad('first', 100, 300), ad('second', 120, 200, { x: 50, width: 300 })] },
+  });
+  const ctx = recorder();
+  drawSnapshot(ctx, plan, ['a']);
+  const lastMark = ctx.calls.findLastIndex((c) => c[0] === 'strokeRect');
+  assert.ok(ctx.calls.findIndex((c) => c[0] === 'fillText' && plan.marks[0].label.startsWith(c[1])) > lastMark, 'a label drawn before the last mark');
+});
+
 test('a gap too thin for its label is left as a plain band', () => {
   const plan = snapshotLayout({
     snapshot: { viewport: { width: 412, height: 823 }, pageHeight: 3000, tiles: [tile(0), tile(825), tile(1648), tile(2177)] },

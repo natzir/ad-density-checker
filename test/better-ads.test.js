@@ -24,6 +24,24 @@ test('ads that were all behind something (a cookie dialog left open) flag the re
   assert.equal(evaluate([inline('out', 0, 4600, 250)], { begin: 0, end: 3000 }).covered, false);
 });
 
+test('an ad a sticky box holds is placed and counted where a screenshot shows it, not where it last was', () => {
+  // The US Sun desktop: Navy Federal's rail ad follows the reader in a sticky box for a while, then stops with
+  // its column. It is hidden from the screenshots after the first that has it, so its last place shows nothing.
+  const result = evaluate([
+    inline('rail', 0, 300, 337, { stuck: true }),
+    inline('rail', 823, 900, 337, { stuck: true, tile: 1 }),
+    inline('rail', 1646, 2449, 337, { stuck: true }),
+  ], { begin: 0, end: 4000 });
+  const ad = result.ads.find((a) => a.id === 'rail');
+  assert.equal(ad.kind, 'inline');
+  assert.equal(ad.top, 900);
+  assert.equal(ad.tile, 1);
+  assert.equal(ad.countedHeight, 337);
+  // An ad that scrolls with the page keeps its last place, captured or not.
+  const plain = evaluate([inline('a', 0, 300, 250, { tile: 0 }), inline('a', 823, 310, 250)], { begin: 0, end: 4000 });
+  assert.equal(plain.ads.find((a) => a.id === 'a').top, 310);
+});
+
 test('isSticky: same screen position after scrolling more than its height', () => {
   assert.equal(isSticky([sticky('s', 0, 723, 100), sticky('s', 823, 723, 100)]), true);
 });

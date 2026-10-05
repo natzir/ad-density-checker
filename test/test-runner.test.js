@@ -458,6 +458,54 @@ test('a piece of an ad gate that shows up after the gate\'s first screenshot is 
   assert.equal(popUp.tile, 0);
 });
 
+test('a rail ad a sticky box holds on screen shows in the first screenshot that has it and is hidden from the later ones', async () => {
+  // CBS desktop: the right rail's 300 x 600 ad stays at 440 px from the top down the article; it came out in every
+  // screenshot, as many times as the page has screens.
+  const { cdp, run } = setup({ pageHeight: 3000, ads: [
+    { id: 40, sticky: true, fixed: false, stuck: true, overlay: false, overContent: false, bottomHit: false, layer: null, viewportTop: 300, height: 250, width: 300 },
+  ] });
+  const result = await run();
+  const hides = cdp.sent.filter((c) => String(c.params?.functionDeclaration ?? '').includes('function hideFixedAds'));
+  assert.ok(hides.length > 0);
+  assert.ok(hides.every((c) => JSON.stringify(c.params.arguments) === '[{"objectId":"obj-40"}]'));
+  assert.equal(result.betterAds.ads.find((a) => a.id === '40').tile, 0);
+});
+
+test('a video player floating in a corner while it shows the site\'s video shows in one screenshot, even with its ad pieces under its controls', async () => {
+  // The US Sun desktop: the article's Brightcove player floats at the bottom right (div#video_…, position: fixed,
+  // 375 x 262) down the whole article; the pieces Chrome tags in it (Google IMA's) lie under the player's
+  // controls, so none was ever on top, and the player came out in every screenshot.
+  const { cdp, run } = setup({ pageHeight: 3000, ads: [
+    { id: 50, sticky: true, viewportTop: 500, height: 262, width: 375, shown: false, overContent: false, player: 'content', playerKey: 'p1' },
+  ] });
+  await run();
+  const hides = cdp.sent.filter((c) => String(c.params?.functionDeclaration ?? '').includes('function hideFixedAds'));
+  assert.ok(hides.length > 0);
+  assert.ok(hides.every((c) => JSON.stringify(c.params.arguments) === '[{"objectId":"obj-50"}]'));
+});
+
+test('a fixed layer on screen in a screenshot is hidden from the later ones even when none of its ads is on top or visible', async () => {
+  // The US Sun: during an ad, the floating player's IMA pieces are hidden by CSS and under its controls; the
+  // player came out in three screenshots before it showed the site's video.
+  const { cdp, run } = setup({ pageHeight: 3000, ads: [
+    { id: 52, sticky: true, viewportTop: 500, height: 208, width: 367, shown: false, overContent: false, player: 'ad', playerKey: 'p1', layer: 'float', layerOnScreen: true },
+  ] });
+  await run();
+  const hides = cdp.sent.filter((c) => String(c.params?.functionDeclaration ?? '').includes('function hideFixedAds'));
+  assert.ok(hides.length > 0);
+  assert.ok(hides.every((c) => JSON.stringify(c.params.arguments) === '[{"objectId":"obj-52"}]'));
+});
+
+test('a fixed layer shown in a screenshot is hidden from the later ones even when the ads in it are new ones', async () => {
+  // The US Sun: the floating player's IMA pieces are made again for each ad it plays; the player is the same layer.
+  // The new pieces come with the ad the player plays, never on top of its controls.
+  const piece = { sticky: true, viewportTop: 500, height: 262, width: 375, shown: false, overContent: false, playerKey: 'p1', layer: 'float' };
+  const { cdp, run } = setup({ pageHeight: 3000, ads: [{ id: 50, goneAt: 4, player: 'content', ...piece }, { id: 51, appearsAt: 4, player: 'ad', ...piece }] });
+  await run();
+  const hides = cdp.sent.filter((c) => String(c.params?.functionDeclaration ?? '').includes('function hideFixedAds'));
+  assert.ok(hides.some((c) => JSON.stringify(c.params.arguments) === '[{"objectId":"obj-51"}]'), JSON.stringify(hides.map((c) => c.params.arguments)));
+});
+
 test('a fixed ad hidden from a screenshot is not placed in it, even when it grew there', async () => {
   // Taller from the sixth sample on (the third screenshot), when it is already hidden.
   const { run } = setup({ pageHeight: 3000, ads: [{ id: 12, sticky: true, viewportTop: 723, height: 100, tallerFrom: { tick: 6, height: 150 } }] });

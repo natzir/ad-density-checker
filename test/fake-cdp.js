@@ -20,7 +20,7 @@ import { adItems, articleEndNow, contentBounds, dismissOverlay, labelledAdBoxes,
 // ads may carry source: 'easylist', createdBy (the script URL its creation stack shows) and wraps (the id
 // of a Chrome-tagged ad it contains); stackCalls counts DOM.getNodeStackTraces.
 // An ad may also carry empty (it shows nothing), emptyUntil (empty until that sample) or emptyFrom (empty
-// from that sample on), appearsAt (not in the page before that sample), wrapsFrom / wrapsUntil (the
+// from that sample on), appearsAt (not in the page before that sample), goneAt (not in it from that sample on), wrapsFrom / wrapsUntil (the
 // Chrome-tagged ad it wraps exists from that sample / until that sample), inside (the id of another
 // ad that contains it once that one is in the page) and holdsContent (it holds the page's main, article
 // or h1).
@@ -28,7 +28,9 @@ import { adItems, articleEndNow, contentBounds, dismissOverlay, labelledAdBoxes,
 // sample on it holds an ad found by Chrome, so the probe leaves it to that ad); labelArgs records
 // the ads each labels probe call was given; labelsReversed: the DOM lists the labelled boxes in the
 // reverse of the order the probe gave their reasons (page scripts moved them in between).
-// failCaptures: indexes of screenshot calls that fail. dismissOverlay on an ad closes it: from then on it
+// layerOnScreen: its fixed layer is drawn on screen, whatever the ad shows. shown: false says the probe never finds it on top (a player's ad pieces under its controls).
+// stuck: a sticky box holds it on screen (a rail ad, position: sticky), with sticky: true, fixed: false and
+// overlay: false. failCaptures: indexes of screenshot calls that fail. dismissOverlay on an ad closes it: from then on it
 // has no box (adItems gives null), as with display: none; dismissed lists the ad objects it was called on.
 // failDismiss: dismissOverlay fails (the page threw), and the ad stays. A sticky ad lies over the page's
 // content (overContent) unless it says overContent: false (a skin behind the content, an interscroller),
@@ -166,7 +168,7 @@ export function fakeCdp({
         }
         case 'DOM.getDocument': {
           const tick = stateCalls - 1;
-          const present = (ad) => (ad.sticky || ad.pageTop >= dropped) && tick >= (ad.appearsAt ?? 0);
+          const present = (ad) => (ad.sticky || ad.pageTop >= dropped) && tick >= (ad.appearsAt ?? 0) && tick < (ad.goneAt ?? Infinity);
           const outerOf = (ad) => ads.find((other) => other.id === ad.inside && present(other));
           const build = (ad) => {
             if (ad.source === 'label') return { nodeType: 1, nodeId: 1000 + ad.id, backendNodeId: ad.id, children: [] };
@@ -250,12 +252,14 @@ export function fakeCdp({
             const behind = stateCalls - 1 >= (ad.behindFrom ?? Infinity);
             return {
               x: 0, y, w: ad.width ?? 412, h,
-              visible: !ad.hidden && !ad.cssHidden, shown: ad.page ? false : !ad.cssHidden && !behind, nested: Boolean(ad.nested), video: Boolean(ad.video),
+              visible: !ad.hidden && !ad.cssHidden, shown: ad.shown ?? (ad.page ? false : !ad.cssHidden && !behind), nested: Boolean(ad.nested), video: Boolean(ad.video),
               behindPage: behind,
               wallpaper: Boolean(ad.wallpaper) && !behind,
               page: Boolean(ad.page),
               fixed: ad.fixed ?? Boolean(ad.sticky),
-              overlay: Boolean(ad.sticky),
+              overlay: ad.overlay ?? Boolean(ad.sticky),
+              stuck: Boolean(ad.stuck),
+              layerOnScreen: Boolean(ad.layerOnScreen),
               overContent: ad.overContent ?? Boolean(ad.sticky),
               bottomHit: ad.bottomHit ?? Boolean(ad.sticky),
               layer: ad.layer ?? (ad.sticky ? `layer-${ad.id}` : null),

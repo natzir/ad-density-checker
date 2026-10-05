@@ -6,7 +6,7 @@ Package: `npm run pack` → `dist/ad-density-checker-<version>.zip` (only the fi
 
 ## Store listing
 
-**Name:** Ad Density Checker
+**Name:** Ad Density Checker by Natzir
 
 **Summary** (132 characters max):
 

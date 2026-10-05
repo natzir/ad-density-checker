@@ -1,4 +1,4 @@
-# Ad Density Checker
+# Ad Density Checker by Natzir
 
 A Chrome extension that measures how much of the screen and of the page ads take up, on mobile and desktop, using Chrome's own ad detection. It shows the result next to real-user data from the Chrome UX Report (CrUX) and checks the Better Ads Standards density limits.
 
@@ -21,9 +21,9 @@ The panel leads with the Better Ads verdict, then the viewport figures next to C
 5. Reports average and peak viewport ad density and the average ad count. Time with the tab hidden is left out, as Chrome does.
 6. Removes the emulation and leaves the tab as it is (no reload: a second load right after the test's, with another user agent, is what bot protections block). After a phone test the page keeps its phone version until you reload it.
 
-Chrome's DevTools (Application → Ads) computes the same metrics internally, but extensions can't read those numbers, so the extension recomputes them. Checked against Chrome's own numbers on the same page loads of ad-heavy news sites, the average density was within 2 points and the ad count within 0.1. Most of the gap comes from timing: Chrome rechecks whether an ad is covered at most once per second, so right after a scroll it can briefly keep an ad as visible (or hidden) while the extension already sees the new state.
+Chrome's DevTools (Application → Ads) computes the same metrics internally, but extensions can't read those numbers, so the extension recomputes them. Its figures stay within about 2 points of Chrome's average density and 0.1 of its ad count. The gap comes mostly from timing: Chrome rechecks whether an ad is covered at most once per second, so right after a scroll it can briefly keep an ad as visible (or hidden) while the extension already sees the new state.
 
-Ad CPU time and ad network bytes come from CrUX only: an extension can't read CPU per ad, and its own network count drifted too far from Chrome's on pages with video ads.
+Ad CPU time and ad network bytes come from CrUX only: an extension can't read CPU per ad, nor count ad bytes the way Chrome does.
 
 While it runs, the page ignores your input: scrolling by hand (wheel, trackpad, touch, keys), clicks and typing are blocked and the scrollbar is hidden, so only the test moves the page. Chrome also shows a yellow "started debugging this browser" bar. That is the `debugger` permission at work; pressing **Cancel** on it stops the test.
 
@@ -54,6 +54,7 @@ Ad density follows the [Better Ads definition](https://www.betterads.org/mobile-
 - **Sticky video ad:** a sticky ad that is or contains a `<video>` in the page itself; video players inside cross-origin ad iframes can't be seen.
 - **Video players showing videos:** Chrome tags a whole video player when an ad script made it, whatever it plays (Connatix's player on NY Post plays the site's own news clips; EX.CO's on El Economista, news clips of its own network). A player with Google IMA's ad box that is seen playing its own video isn't counted, labelled "not counted · content video player", wherever it was and whatever covered it, nor does it set the sticky video limit. The space is the video's, like an article's; the ads it plays (pre-rolls, mid-rolls) fall under Better Ads' short-form video standard (videos of 8 minutes or less: no mid-rolls, no pre-rolls over 31 s that can't be skipped in 5 s, no overlays over the middle third or 20 % of the video), which the test doesn't measure; the panel says so. Every piece of the player goes with it: Chrome tags each one the ad script made (its video, ad slots, IMA's frames) and EasyList adds others (Connatix's floating close bar). A player only ever seen playing an ad can't be told from a unit that is all ad (an outstream unit), and counts, as do labelled slots, filled or not: that space is the ads'. Ads inserted into the video stream on the server (Google DAI) can't be told from the content.
 - **Not measured:** native ads that Chrome doesn't tag as ads, autoplay video with sound, flashing ads, the ads inside a video player showing videos (Better Ads' short-form video standard). Other native ad grids placed inside the article element count as part of the main content.
+- **Not measured either, on mobile:** Better Ads' [sticky, pop-out video ads](https://www.betterads.org/mobile-sticky-pop-out-video-ads) and the [sticky video ad with a large inline ad](https://www.betterads.org/mobile-sticky-video-large-inline-ad). A site's own video player that floats with a pre-roll in it isn't one: both standards leave out the ads played before or during the site's videos.
 
 ### Real and Chrome views
 

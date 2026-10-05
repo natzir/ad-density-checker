@@ -1,4 +1,4 @@
-# Ad Density Checker · Privacy policy
+# Ad Density Checker by Natzir · Privacy policy
 
 Last updated: 5 October 2026
 

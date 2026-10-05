@@ -797,6 +797,46 @@ test('adItems says which ads sit in a layer fixed to the screen', () => {
   assert.deepEqual(page.run(adItems, anchor, inline).map((item) => item.fixed), [true, false]);
 });
 
+test('adItems says when an ad\'s fixed layer is drawn on screen, whatever its pieces show (a floating player during an ad)', () => {
+  // The US Sun desktop: while the floating Brightcove player plays an ad, Google IMA's pieces in it are hidden by
+  // CSS; the player itself is on screen.
+  const piece = el('iframe', { visibility: 'hidden', box: { x: 776, y: 666, w: 367, h: 208 } });
+  const player = el('div', { id: 'video_1', position: 'fixed', box: { x: 772, y: 662, w: 375, h: 262 } }, [piece]);
+  const below = el('iframe', { box: { x: 772, y: 1000, w: 375, h: 262 } });
+  const offScreen = el('div', { position: 'fixed', box: { x: 772, y: 1000, w: 375, h: 262 } }, [below]);
+  const faded = el('iframe', { box: { x: 0, y: 880, w: 1350, h: 60 } });
+  const fadedLayer = el('div', { position: 'fixed', box: { x: 0, y: 880, w: 1350, h: 60 } }, [faded]);
+  fadedLayer.style.opacity = '0';
+  const inline = el('div', { box: { x: 100, y: 2300, w: 300, h: 250 } });
+  const page = stubPage({ width: 1350, height: 940, scrollY: 2000, pageHeight: 8000, body: el('body', {}, [player, offScreen, fadedLayer, inline]) });
+  assert.deepEqual(page.run(adItems, piece, below, faded, inline).map((item) => item?.layerOnScreen), [true, false, false, false]);
+});
+
+test('adItems says which ads a sticky box holds on screen, never the page\'s own content', () => {
+  // CBS desktop: the right rail's ad sits in div#mpu-plus-top-right-rail, position: sticky; top: 440px.
+  const rail = el('iframe', { box: { x: 963, y: 440, w: 300, h: 600 } });
+  const inline = el('div', { box: { x: 100, y: 300, w: 300, h: 250 } });
+  const inArticle = el('div', { box: { x: 100, y: 700, w: 300, h: 250 } });
+  const article = el('article', { position: 'sticky', box: { x: 80, y: 0, w: 640, h: 5000 } }, [inArticle]);
+  const page = stubPage({ width: 1350, height: 940, scrollY: 1200, pageHeight: 5000, body: el('body', {}, [
+    el('div', { position: 'sticky', box: { x: 963, y: 440, w: 300, h: 600 } }, [rail]), inline, article,
+  ]) });
+  assert.deepEqual(page.run(adItems, rail, inline, inArticle).map((item) => [item.fixed, item.stuck]), [[false, true], [false, false], [false, false]]);
+});
+
+test('hideFixedAds hides the sticky box that holds a rail ad on screen (CBS desktop), not the page\'s content', () => {
+  const ad = el('iframe', { box: { x: 963, y: 440, w: 300, h: 600 } });
+  const box = el('div', { position: 'sticky', box: { x: 963, y: 440, w: 300, h: 600 } }, [ad]);
+  const rail = el('div', { box: { x: 940, y: -1200, w: 340, h: 5000 } }, [box]);
+  const inArticle = el('div', { box: { x: 100, y: 700, w: 300, h: 250 } });
+  const article = el('article', { position: 'sticky', box: { x: 80, y: 0, w: 640, h: 5000 } }, [inArticle]);
+  const page = stubPage({ width: 1350, height: 940, scrollY: 1200, pageHeight: 5000, body: el('body', {}, [rail, article]) });
+  assert.equal(page.run(hideFixedAds, ad, inArticle), 1);
+  assert.deepEqual([rail, box, ad, article].map((n) => n.style.opacity), ['', '0', '', '']);
+  page.run(showHidden);
+  assert.equal(box.style.opacity, '');
+});
+
 test('hideFixedAds hides an ad gate\'s blurring layer as it would a fixed one (Vozpópuli: a sticky panel in a tall absolute wall)', () => {
   const ad = el('iframe', { box: { x: 244, y: 2300, w: 430, h: 127 } });
   const modal = el('div', { position: 'sticky', box: { x: 244, y: 2250, w: 500, h: 380 } }, [ad]);

@@ -270,9 +270,10 @@ test('the result announcement leads with an auto-redirect', () => {
   assert.ok(said.startsWith('Test stopped: the page sent the reader to safedevice.click with no click or tap.'));
 });
 
-test('playerNote says a content video player isn\'t counted and the ads it plays aren\'t measured', () => {
+test('playerNote says a content video player isn\'t counted, not even floating, and the ads it plays aren\'t measured', () => {
+  // eltiempo.es: the article's video starts with a pre-roll and floats at the bottom of the screen once scrolled past.
   assert.equal(playerNote({ ads: [{ counted: false, reason: 'content-video' }] }),
-    "A video player showing videos, not ads, isn't counted as an ad. The ads it plays (pre-rolls, mid-rolls) fall under Better Ads' short-form video standard, which this test doesn't measure.");
+    "A video player showing videos, not ads, isn't counted as an ad, nor as a sticky pop-out video ad when it floats: Better Ads leaves out the ads played before or during the site's own videos. Those ads (pre-rolls, mid-rolls) fall under its short-form video standard, which this test doesn't measure.");
   assert.equal(playerNote({ ads: [{ counted: false, reason: 'hidden' }] }), null);
   assert.equal(playerNote(undefined), null);
 });
