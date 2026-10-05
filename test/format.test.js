@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { arrowTarget, comparisonRows, cruxColumnLabel, cruxStatusLine, pageParts, progressAnnouncement, resultAnnouncement, snapshotLabel, sparkline, stopNotice, afterTestNote, testSparkline, verdict, coveredNotice, unseenNote, snapshotMissingNote, gateNotice, viewBetterAds, viewTitle, chromeLine, chromeNotCountedNote, playerNote, redirectNotice } from '../lib/format.js';
+import { arrowTarget, comparisonRows, cruxColumnLabel, cruxStatusLine, pageParts, progressAnnouncement, resultAnnouncement, snapshotLabel, sparkline, stopNotice, afterTestNote, testSparkline, verdict, coveredNotice, unseenNote, snapshotMissingNote, gateNotice, viewBetterAds, viewTitle, chromeLine, chromeNotCountedNote, playerNote, redirectNotice, loadNotice } from '../lib/format.js';
 
 test('comparisonRows shows dashes when nothing is known yet', () => {
   assert.deepEqual(comparisonRows(null, null), [
@@ -276,4 +276,14 @@ test('playerNote says a content video player isn\'t counted, not even floating, 
     "A video player showing videos, not ads, isn't counted as an ad, nor as a sticky pop-out video ad when it floats: Better Ads leaves out the ads played before or during the site's own videos. Those ads (pre-rolls, mid-rolls) fall under its short-form video standard, which this test doesn't measure.");
   assert.equal(playerNote({ ads: [{ counted: false, reason: 'hidden' }] }), null);
   assert.equal(playerNote(undefined), null);
+});
+
+test('loadNotice warns only when the page never got its document ready, not when its load event is late', () => {
+  // Newsweek: the document is ready at 0.9 s and the load event comes at 35 s; the test goes on from the document.
+  assert.equal(loadNotice({ loadEventReached: false, documentReady: true }), null);
+  assert.equal(loadNotice({ loadEventReached: true, documentReady: true }), null);
+  assert.equal(loadNotice({ loadEventReached: false, documentReady: false }), "The page didn't finish loading in 30 s; results may be incomplete.");
+  // A result kept from before the document was tracked.
+  assert.equal(loadNotice({ loadEventReached: false }), "The page didn't finish loading in 30 s; results may be incomplete.");
+  assert.equal(loadNotice(null), null);
 });

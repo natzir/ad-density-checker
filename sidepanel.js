@@ -1,7 +1,7 @@
 // Side panel: CrUX on open, test runs through the service worker; the Better Ads verdict first,
 // then the viewport and CrUX figures, then the snapshot.
 import { checkKey, cruxVisLink, fetchCrux, isHttpUrl, maskKey, NO_FIELD_DATA, stripFragment } from './lib/crux.js';
-import { arrowTarget, comparisonRows, cruxColumnLabel, cruxStatusLine, pageParts, progressAnnouncement, resultAnnouncement, snapshotLabel, sparkline, stopNotice, afterTestNote, testSparkline, verdict, coveredNotice, unseenNote, snapshotMissingNote, gateNotice, viewBetterAds, viewTitle, chromeLine, chromeNotCountedNote, playerNote, redirectNotice } from './lib/format.js';
+import { arrowTarget, comparisonRows, cruxColumnLabel, cruxStatusLine, pageParts, progressAnnouncement, resultAnnouncement, snapshotLabel, sparkline, stopNotice, afterTestNote, testSparkline, verdict, coveredNotice, unseenNote, snapshotMissingNote, gateNotice, viewBetterAds, viewTitle, chromeLine, chromeNotCountedNote, playerNote, redirectNotice, loadNotice } from './lib/format.js';
 import { comparisonSize, drawComparison, drawSnapshot, exportSize, pruneSnapshots, snapshotFilename, snapshotLayout, snapshotSummary, stripSize, withImages } from './lib/snapshot.js';
 import { canTest } from './lib/test-runner.js';
 
@@ -251,9 +251,7 @@ function render() {
 
   const warnings = [];
   if (web && !testable) warnings.push("Chrome doesn't let extensions test Chrome Web Store pages.");
-  if (state.test && !state.test.loadEventReached) {
-    warnings.push('The page never fired its load event (30 s); results may be incomplete.');
-  }
+  if (loadNotice(state.test)) warnings.push(loadNotice(state.test));
   if (state.test && state.test.scrollable === false) {
     warnings.push("The page is no taller than the screen, so only the first screen was measured (an overlay may block scrolling, or the page scrolls inside a container).");
   }
