@@ -511,6 +511,52 @@ test('the article text is the container with most of its paragraphs: a long list
   assert.equal(page.run(contentBounds, 0).articleEnd, 3200);
 });
 
+test('once the page has scrolled, the article\'s text is the one found at the top, not the next story an infinite scroll appends', () => {
+  // Livemint and El Economista: each story's body in its own container. The next story comes in below
+  // a Taboola feed as the test scrolls, and its body holds more text than the tested one.
+  const later = (p, y) => { p.box = { x: 16, y, w: 380, h: 100 }; };
+  const feed = el('div', { id: 'taboola-below-article' });
+  const nextHeadline = el('h1', { text: 'La siguiente noticia del día' });
+  const nextBody = [...Array(8)].map(() => el('p', { text: TEXT }));
+  const page = stubPage({
+    ...MOBILE,
+    pageHeight: 7000,
+    body: el('body', {}, [articleMeta(), header(),
+      el('h1', { text: 'Sánchez decidirá el fin de semana', box: { x: 16, y: 100, w: 380, h: 100 } }),
+      el('div', { box: { x: 0, y: 300, w: 412, h: 1100 } }, paragraphs(300, 500, 700, 900, 1100, 1300)),
+      feed,
+      nextHeadline,
+      el('div', {}, nextBody),
+    ]),
+  });
+  page.run(contentBounds, 0); // the page as loaded, at the top
+  feed.box = { x: 0, y: 1500, w: 412, h: 2500 };
+  nextHeadline.box = { x: 16, y: 4200, w: 380, h: 100 };
+  nextBody.forEach((p, i) => later(p, 4400 + i * 200));
+  page.window.scrollY = 2000;
+  assert.equal(page.run(contentBounds, 0).articleEnd, 1500);
+});
+
+test('while the page is at the top, its article\'s text is found again as the page loads', () => {
+  // A teaser renders first; the body comes in below it before the test scrolls.
+  const body = [...Array(6)].map(() => el('p', { text: TEXT }));
+  const page = stubPage({
+    ...MOBILE,
+    pageHeight: 7000,
+    body: el('body', {}, [articleMeta(), header(),
+      el('h1', { text: 'Sánchez decidirá el fin de semana', box: { x: 16, y: 100, w: 380, h: 100 } }),
+      el('div', { box: { x: 0, y: 220, w: 412, h: 100 } }, paragraphs(220)),
+      el('div', {}, body),
+      el('div', { box: { x: 16, y: 1700, w: 380, h: 120 } }, headlines(1700)),
+    ]),
+  });
+  page.run(contentBounds, 0);
+  body.forEach((p, i) => { p.box = { x: 16, y: 400 + i * 200, w: 380, h: 100 }; });
+  assert.equal(page.run(contentBounds, 0).articleEnd, 1700);
+  page.window.scrollY = 900;
+  assert.equal(page.run(contentBounds, 0).articleEnd, 1700);
+});
+
 test('an article page without an <article> element ends after its text container', () => {
   // Europa Press: no <article>; the site's footer text sits in plain <div>s.
   const page = stubPage({
