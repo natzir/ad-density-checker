@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULTS, DEVICES, PAGE_INFO_EXPR, PAGE_STATE_EXPR, SCROLL_EXPR, canTest, desktopUserAgent, mobileUserAgent, runTest, sameSite } from '../lib/test-runner.js';
+import { DEFAULTS, DEVICES, PAGE_INFO_EXPR, PAGE_STATE_EXPR, SCROLL_EXPR, canTest, desktopUserAgent, mobileUserAgent, restoreAddress, runTest, sameSite } from '../lib/test-runner.js';
 import { compileRules } from '../lib/adlist.js';
 import { fakeCdp, fakeClock } from './fake-cdp.js';
 
@@ -904,6 +904,62 @@ test('a test stopped before the end of the article counts only the part of the p
   assert.deepEqual(result.betterAds.content, { begin: 0, end: 1646 });
   assert.equal(result.betterAds.density.value, 15.2); // 250 / 1646, not 500 / 4000
   assert.equal(result.snapshot.pageHeight, 1646);
+});
+
+const addressRestores = (cdp) => cdp.sent
+  .filter((c) => c.method === 'Runtime.evaluate' && c.params.expression.startsWith(`(${restoreAddress})(`))
+  .map((c) => JSON.parse(c.params.expression.slice(`(${restoreAddress})(`.length, -1)));
+
+test('after an infinite scroll moved the address on, the test puts the tested article\'s address back, without reloading', async () => {
+  // The panel keeps a result for the address it tested: left on the next article's, it showed none.
+  const { cdp, run } = setup({
+    pageHeight: 6000,
+    content: { begin: 0, articleEnd: 4000 },
+    events: [{ atTick: 5, method: 'Page.navigatedWithinDocument', params: { frameId: 'main', url: 'https://news.example/next-story' } }],
+  });
+  const result = await run();
+  assert.equal(result.stoppedAt, 'next-article');
+  assert.deepEqual(addressRestores(cdp), ['https://news.example/']);
+  assert.equal(cdp.sent.filter((c) => c.method === 'Page.reload').length, 1); // the test's own, at the start
+});
+
+test('the address put back is the one the page tidied itself to before the test scrolled', async () => {
+  const { cdp, run } = setup({
+    pageHeight: 6000,
+    content: { begin: 0, articleEnd: 4000 },
+    commitFrame: { id: 'main', url: 'https://news.example/story' },
+    events: [
+      { atTick: 1, method: 'Page.navigatedWithinDocument', params: { frameId: 'main', url: 'https://news.example/story/' } },
+      { atTick: 5, method: 'Page.navigatedWithinDocument', params: { frameId: 'main', url: 'https://news.example/next-story/' } },
+    ],
+  });
+  await run();
+  assert.deepEqual(addressRestores(cdp), ['https://news.example/story/']);
+});
+
+test('on a list whose address moved to its next page while scrolling, the address goes back too', async () => {
+  const { cdp, run } = setup({
+    pageHeight: 3000,
+    events: [{ atTick: 5, method: 'Page.navigatedWithinDocument', params: { frameId: 'main', url: 'https://news.example/page/2/' } }],
+  });
+  await run();
+  assert.deepEqual(addressRestores(cdp), ['https://news.example/']);
+});
+
+test('a page whose address did not change keeps it: nothing is put back', async () => {
+  const { cdp, run } = setup({ pageHeight: 3000 });
+  await run();
+  assert.deepEqual(addressRestores(cdp), []);
+});
+
+test('restoreAddress replaces the address in place, keeping the history entry\'s state, only when it differs beyond the fragment', () => {
+  const calls = [];
+  const history = { state: { key: 7 }, replaceState: (...args) => calls.push(args) };
+  const at = (href) => new Function('location', 'history', 'url', `return (${restoreAddress})(url);`)({ href }, history, 'https://news.example/story');
+  at('https://news.example/next-story');
+  assert.deepEqual(calls, [[{ key: 7 }, '', 'https://news.example/story']]);
+  at('https://news.example/story#comments');
+  assert.equal(calls.length, 1);
 });
 
 test('a test whose tab stayed hidden throughout is an error, not a 0 % pass', async () => {
