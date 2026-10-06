@@ -443,6 +443,35 @@ test('a box with overflow hidden that holds all its text (a float clearfix) cuts
   assert.equal(page.run(contentBounds, 0).articleEnd, 3100);
 });
 
+test('an MGID widget below the text ends the article, like a Taboola feed', () => {
+  // El Espectador: "Te puede interesar", MGID's widget (data-type="_mgwidget"), under the article.
+  const page = stubPage({
+    ...MOBILE,
+    pageHeight: 7000,
+    body: el('body', {}, [articleMeta(), header(), el('article', { box: { x: 0, y: 100, w: 412, h: 6000 } }, [
+      ...paragraphs(300, 500, 2900),
+      el('div', { attrs: { 'data-type': '_mgwidget' }, box: { x: 16, y: 3100, w: 380, h: 2400 } }),
+      el('aside', { box: { x: 16, y: 5600, w: 380, h: 300 } }),
+    ])]),
+  });
+  assert.equal(page.run(contentBounds, 0).articleEnd, 3100);
+});
+
+test('a feed widget an ad fills is the ad\'s slot, not the end of the article', () => {
+  // MGID serves single ad units through the same widget as its feed (El Espectador's side rail).
+  const ad = el('div', { box: { x: 16, y: 3100, w: 380, h: 300 } });
+  const page = stubPage({
+    ...MOBILE,
+    pageHeight: 7000,
+    body: el('body', {}, [articleMeta(), header(), el('article', { box: { x: 0, y: 100, w: 412, h: 6000 } }, [
+      ...paragraphs(300, 500, 2900),
+      el('div', { attrs: { 'data-type': '_mgwidget' }, box: { x: 16, y: 3100, w: 380, h: 300 } }, [ad]),
+      el('aside', { box: { x: 16, y: 3500, w: 380, h: 300 } }),
+    ])]),
+  });
+  assert.equal(page.run(contentBounds, 0, ad).articleEnd, 3500);
+});
+
 test('an aside that holds an ad is the ad\'s slot, not the end of the article', () => {
   // Sport and Levante-EMV put their ads in <aside>; Chrome tags the ad inside.
   const ad = el('iframe', { box: { x: 46, y: 3060, w: 300, h: 250 } });
