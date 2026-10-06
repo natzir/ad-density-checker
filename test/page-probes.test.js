@@ -413,6 +413,36 @@ test('nothing above the last of the article text ends it (a feed or related box 
   assert.equal(page.run(contentBounds, 0).articleEnd, 3200);
 });
 
+test('text cut off by a collapsed box ("Show full article") does not stretch the article over what follows the button', () => {
+  // NDTV on a phone: the body sits in a 500 px box with overflow hidden; its paragraphs keep their
+  // place in the layout down to 4600 px, under the related stories and sponsored cards below the button.
+  const collapsed = el('div', { overflowY: 'hidden', box: { x: 0, y: 300, w: 412, h: 500 } }, paragraphs(300, 500, 700, 900, 1500, 2500, 3500, 4500));
+  const page = stubPage({
+    ...MOBILE,
+    pageHeight: 7000,
+    body: el('body', {}, [articleMeta(), header(), el('article', { box: { x: 0, y: 100, w: 412, h: 6000 } }, [
+      collapsed,
+      el('div', { box: { x: 16, y: 820, w: 380, h: 120 } }, headlines(820)),
+      el('aside', { box: { x: 16, y: 5000, w: 380, h: 300 } }),
+    ])]),
+  });
+  assert.equal(page.run(contentBounds, 0).articleEnd, 820);
+});
+
+test('a box with overflow hidden that holds all its text (a float clearfix) cuts nothing', () => {
+  const wrapper = el('div', { overflowY: 'hidden', box: { x: 0, y: 300, w: 412, h: 2800 } }, paragraphs(300, 500, 2900));
+  const page = stubPage({
+    ...MOBILE,
+    pageHeight: 7000,
+    body: el('body', {}, [articleMeta(), header(), el('article', { box: { x: 0, y: 100, w: 412, h: 6000 } }, [
+      wrapper,
+      el('div', { box: { x: 16, y: 1000, w: 380, h: 120 } }, headlines(1000)),
+      el('aside', { box: { x: 16, y: 3100, w: 380, h: 300 } }),
+    ])]),
+  });
+  assert.equal(page.run(contentBounds, 0).articleEnd, 3100);
+});
+
 test('an aside that holds an ad is the ad\'s slot, not the end of the article', () => {
   // Sport and Levante-EMV put their ads in <aside>; Chrome tags the ad inside.
   const ad = el('iframe', { box: { x: 46, y: 3060, w: 300, h: 250 } });

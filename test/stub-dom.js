@@ -30,7 +30,7 @@ export function el(tag, options = {}, children = []) {
     className: options.className ?? '',
     attrs: options.attrs ?? {},
     box: options.box ?? null, // { x, y, w, h } in page pixels
-    style: { display: options.display ?? 'block', transform: options.transform ?? 'none', filter: 'none', perspective: 'none', position: options.position ?? 'static', top: options.top ?? 'auto', bottom: options.bottom ?? 'auto', zIndex: String(options.z ?? 0), visibility: options.visibility ?? '', opacity: '', backgroundImage: options.backgroundImage ?? 'none', backgroundColor: options.backgroundColor ?? 'rgba(0, 0, 0, 0)', backdropFilter: options.backdropFilter ?? 'none' },
+    style: { display: options.display ?? 'block', transform: options.transform ?? 'none', filter: 'none', perspective: 'none', position: options.position ?? 'static', top: options.top ?? 'auto', bottom: options.bottom ?? 'auto', zIndex: String(options.z ?? 0), visibility: options.visibility ?? '', opacity: '', backgroundImage: options.backgroundImage ?? 'none', backgroundColor: options.backgroundColor ?? 'rgba(0, 0, 0, 0)', backdropFilter: options.backdropFilter ?? 'none', overflowY: options.overflowY ?? 'visible' },
     visible: options.visible ?? true,
     pointerEvents: options.pointerEvents ?? 'auto',
     ownText: options.text ?? '',
