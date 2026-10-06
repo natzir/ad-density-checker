@@ -97,14 +97,16 @@ Network rules from EasyList and its regional lists (Liste FR, EasyList Spanish, 
 
 ## Install
 
-The extension isn't on the Chrome Web Store. Load it from this repo:
+Install it from the [Chrome Web Store](https://chromewebstore.google.com/detail/ad-density-checker-by-nat/eepgdobkjipboadjpdbcfckpbkcmeghb), then pin it and click its icon to open the side panel. Chrome keeps it up to date.
+
+To run the latest code from this repo instead (changes reach the store once Google has reviewed them):
 
 1. Download the repo (Code → Download ZIP, then unzip) or `git clone` it.
 2. Open `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and pick the repo folder.
 4. Pin the extension and click its icon to open the side panel.
 
-Needs Chrome 154 or later. To update, download or `git pull` again and click the reload icon on `chrome://extensions`.
+Needs Chrome 154 or later. To update a copy loaded from the repo, download or `git pull` again and click the reload icon on `chrome://extensions`.
 
 ## CrUX API key (optional)
 
