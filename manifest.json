@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Ad Density Checker by Natzir",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Measures ad density like a Better Ads reviewer and shows which ads Chrome's ad tagging, behind CrUX ad metrics, counts or misses.",
   "minimum_chrome_version": "154",
   "permissions": ["debugger", "sidePanel", "storage", "tabs"],
