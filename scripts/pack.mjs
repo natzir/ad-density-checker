@@ -17,6 +17,8 @@ export function packFiles() {
     'sidepanel.css',
     'sidepanel.js',
     'tokens.css',
+    'welcome.html',
+    'welcome.css',
     ...inDir('lib', '.js'),
     'lib/adlists-LICENSE.txt',
     ...inDir('icons', '.png'),

@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { packFiles } from '../scripts/pack.mjs';
+import { WELCOME_PAGE } from '../lib/welcome.js';
 
 const root = new URL('../', import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), 'utf8');
@@ -31,11 +32,15 @@ test('the package holds every file the extension loads', () => {
     ...Object.values(manifest.icons),
     ...Object.values(manifest.action.default_icon),
   ]);
-  // What the panel page links and fetches.
-  const html = read('sidepanel.html');
-  for (const [, href] of html.matchAll(/(?:href|src)="([^":]+)"/g)) needed.add(href);
+  // What the panel and the welcome page link, the stylesheets they link load, and what the panel fetches.
+  for (const page of [manifest.side_panel.default_path, WELCOME_PAGE]) {
+    needed.add(page);
+    for (const [, href] of read(page).matchAll(/(?:href|src)="([^":#][^":]*)"/g)) { // files, not URLs or #fragments
+      needed.add(href);
+      if (href.endsWith('.css')) for (const [, path] of read(href).matchAll(/url\(([^)]+)\)/g)) needed.add(path);
+    }
+  }
   for (const [, path] of read('sidepanel.js').matchAll(/fetch\('([^']+)'\)/g)) needed.add(path);
-  for (const [, path] of read('sidepanel.css').matchAll(/url\(([^)]+)\)/g)) needed.add(path);
   // Every module the scripts import, followed through lib/.
   for (const file of staticImports([...needed].filter((f) => f.endsWith('.js')))) needed.add(file);
   for (const file of needed) assert.ok(files.includes(file), `${file} is missing from the package`);

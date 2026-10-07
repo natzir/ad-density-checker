@@ -3,6 +3,7 @@ import { createCdp } from './lib/cdp.js';
 import { clearRunning, markRunning, restoreInterrupted, restoreTab } from './lib/restore-tab.js';
 import { runTest, TestError } from './lib/test-runner.js';
 import { bundledRules } from './lib/bundled-rules.js';
+import { openWelcome } from './lib/welcome.js';
 
 const CHROME_MAJOR = Number(navigator.userAgent.match(/Chrome\/(\d+)/)?.[1] ?? 154);
 const running = new Map(); // tabId → AbortController
@@ -12,6 +13,8 @@ const WORKER = crypto.randomUUID();
 restoreInterrupted(chrome.storage.local, chrome.tabs, WORKER, (tabId) => chrome.debugger.detach({ tabId })).catch(() => {});
 
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
+
+chrome.runtime.onInstalled.addListener((details) => openWelcome(details, chrome.tabs).catch(() => {}));
 
 // The user pressed Cancel on the debugging bar, or the tab closed.
 chrome.debugger.onDetach.addListener((source, reason) => {
